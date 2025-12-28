@@ -140,6 +140,10 @@ p {
     font-size: calc(8px + 1vmin);
 }
 
+.small2 {
+    font-size: calc(6px + 1vmin);
+}
+
 footer img {
     width: 200px;
 }
