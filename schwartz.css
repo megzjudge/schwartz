@@ -144,6 +144,32 @@ footer img {
     width: 200px;
 }
 
+.zoom {
+  display: inline-block;
+  cursor: zoom-in;
+  overflow: hidden;
+  border-radius: 12px; /* optional */
+}
+
+.zoom > input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.zoom > img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  transform-origin: center;
+  transition: transform 200ms ease;
+}
+
+.zoom > input:checked + img {
+  transform: scale(2);       /* zoom level */
+  cursor: zoom-out;
+}
+
 .dimension {
     color:  rgba(0, 217, 255, 0.628);
     text-shadow:
