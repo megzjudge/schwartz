@@ -138,6 +138,7 @@ p {
 
 .small {
     font-size: calc(8px + 1vmin);
+    padding-bottom: 8px;
 }
 
 .small2 {
