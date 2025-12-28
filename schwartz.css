@@ -136,6 +136,10 @@ p {
     1px 1px 1px white;
 }
 
+.small {
+    font-size: calc(10px + 1vmin);
+}
+
 footer img {
     width: 200px;
 }
