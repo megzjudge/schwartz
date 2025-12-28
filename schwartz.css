@@ -145,25 +145,19 @@ footer img {
 }
 
 .scroll-sections {
-  overscroll-behavior-y: contain;
   scroll-snap-type: y mandatory;
 }
 
-.panel {
+html.zoomed {
+  scroll-snap-type: none !important;
+}
+
+.scroll-sections > section {
   scroll-snap-align: start;
   scroll-snap-stop: always;
 }
 
-.pinch-image {
-  max-width: 100%;
-  height: auto;
-  touch-action: pan-y pinch-zoom;
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-touch-callout: none;
-}
-
-.no-snap {
+.scroll-sections.zoomed {
   scroll-snap-type: none !important;
 }
 
