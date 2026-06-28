@@ -114,7 +114,7 @@
       <div class="chart-wrap chart-wrap-wide">
         <canvas id="results-chart"></canvas>
       </div>
-      <p class="chart-source-note">Demographic bars sourced from <a href="https://www.yourmorals.org/" target="_blank" rel="noopener">YourMorals.org</a>. Placeholder data pending capture.</p>
+      <p class="chart-source-note">Demographic bars sourced from <a href="https://www.yourmorals.org/" target="_blank" rel="noopener">YourMorals.org</a>, 29 June 2026.</p>
     </section>
 
     <section class="compare-section">
@@ -127,11 +127,8 @@
       <div class="demographic-groups" id="demographic-groups"></div>
 
       <div class="demographic-actions">
-        <div class="mass-presets">
-          <button type="button" class="btn btn-secondary mass-preset-btn" data-preset="low-selfDirection">Lowest self-direction</button>
-          <button type="button" class="btn btn-secondary mass-preset-btn" data-preset="high-selfDirection">Highest self-direction</button>
-          <button type="button" class="btn btn-secondary mass-preset-btn" data-preset="low-universalism">Lowest universalism</button>
-          <button type="button" class="btn btn-secondary mass-preset-btn" data-preset="high-universalism">Highest universalism</button>
+        <div class="mass-presets-row">
+          <div class="mass-presets" id="mass-presets"></div>
           <button type="button" class="btn btn-secondary" id="reset-chart-btn">Default</button>
         </div>
         <button type="button" class="btn btn-secondary" id="clear-demographics-btn">Clear demographics</button>

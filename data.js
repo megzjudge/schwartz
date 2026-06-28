@@ -32,12 +32,25 @@ const MY_RESULT = {
 
 const YOUR_RESULT_COLOR = '#d4553a';
 
-const MASS_PRESET_LABELS = {
-  'low-selfDirection': 'Lowest 10 self-direction (singles + combos)',
-  'high-selfDirection': 'Highest 10 self-direction (singles + combos)',
-  'low-universalism': 'Lowest 10 universalism (singles + combos)',
-  'high-universalism': 'Highest 10 universalism (singles + combos)',
+const MASS_PRESET_COLORS = {
+  power: '#7a4a32',
+  achievement: '#c45c3e',
+  hedonism: '#d97848',
+  stimulation: '#e8a040',
+  selfDirection: '#a83232',
+  universalism: '#2a7a6e',
+  benevolence: '#6b8e4e',
+  tradition: '#7a4a8b',
+  conformity: '#4a6fa5',
+  security: '#5c6b7a',
 };
+
+const MASS_PRESET_LABELS = Object.fromEntries(
+  DIMENSIONS.flatMap((d) => [
+    [`low-${d.key}`, `Lowest 10 ${d.label.toLowerCase()} (singles + combos)`],
+    [`high-${d.key}`, `Highest 10 ${d.label.toLowerCase()} (singles + combos)`],
+  ]),
+);
 
 const DEMOGRAPHICS = [
   { id: 'male', label: 'Male', category: 'gender', color: '#c45c3e', ...ZERO },

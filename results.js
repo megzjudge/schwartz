@@ -209,8 +209,11 @@ function getAllScoredGroups() {
 }
 
 function applyMassPreset(preset) {
-  const field = preset.includes('universalism') ? 'universalism' : 'selfDirection';
-  const ascending = preset.startsWith('low');
+  const match = preset.match(/^(low|high)-(.+)$/);
+  if (!match || !DIMENSION_KEYS.includes(match[2])) return;
+
+  const ascending = match[1] === 'low';
+  const field = match[2];
   const sorted = [...getAllScoredGroups()].sort((a, b) => (
     ascending ? a[field] - b[field] : b[field] - a[field]
   ));
@@ -609,6 +612,26 @@ function renderCategorySection(container, { key, title }) {
   container.appendChild(section);
 }
 
+function renderMassPresets() {
+  const container = document.getElementById('mass-presets');
+  if (!container) return;
+
+  container.innerHTML = '';
+  DIMENSIONS.forEach((dim) => {
+    ['low', 'high'].forEach((dir) => {
+      const preset = `${dir}-${dim.key}`;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn btn-secondary mass-preset-btn';
+      btn.dataset.preset = preset;
+      btn.style.setProperty('--preset-color', MASS_PRESET_COLORS[dim.key]);
+      btn.textContent = `${dir === 'low' ? 'Lowest' : 'Highest'} ${dim.label.toLowerCase()}`;
+      btn.addEventListener('click', () => applyMassPreset(preset));
+      container.appendChild(btn);
+    });
+  });
+}
+
 function renderDemographicFilters() {
   const container = document.getElementById('demographic-groups');
   container.innerHTML = '';
@@ -722,10 +745,7 @@ function initResults() {
   document.getElementById('reset-chart-btn').addEventListener('click', resetToDefaultChart);
   document.getElementById('change-colour-btn').addEventListener('click', cycleVisitorColor);
 
-  document.querySelectorAll('.mass-preset-btn').forEach((btn) => {
-    btn.addEventListener('click', () => applyMassPreset(btn.dataset.preset));
-  });
-
+  renderMassPresets();
   renderDemographicFilters();
   initBarColors();
   if (visitorResults) {
