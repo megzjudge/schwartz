@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visualize Results — Schwartz Values</title>
+  <meta name="author" content="Megan Judge" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#faf6f0" />
+  <meta property="og:url" content="https://schwartz.jdge.cc/results.html" />
+  <meta property="og:image" content="/images/schwartz.svg" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:title" content="Visualize Results — Schwartz Values" />
+  <meta property="og:description" content="Compare your YourMorals.org Schwartz value scores against demographic averages" />
+  <meta name="twitter:image" content="https://schwartz.jdge.cc/images/schwartz.svg" />
+  <link rel="icon" type="image/svg+xml" href="/images/schwartz.svg" />
+  <link rel="canonical" href="https://schwartz.jdge.cc/results.html" />
+  <link rel="alternate" href="https://schwartz.jdge.cc/results.html" hreflang="en" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">Schwartz Values</a>
+      <nav class="nav">
+        <a href="index.html" class="nav-link">About</a>
+        <a href="https://www.yourmorals.org/" class="nav-link" target="_blank" rel="noopener">Take on YourMorals.org ↗</a>
+        <a href="results.html" class="nav-link active">Visualize Results</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container-wide">
+    <div class="results-header">
+      <h1>Visualize Your Results</h1>
+      <p>Enter the scores from your <a href="https://www.yourmorals.org/" target="_blank" rel="noopener">YourMorals.org</a> results page to compare against demographic averages.</p>
+    </div>
+
+    <section class="score-entry-section">
+      <h2>Enter your scores from YourMorals.org</h2>
+      <form id="score-form" class="score-entry-form">
+        <div class="score-entry-grid">
+          <div class="score-input-group">
+            <label for="input-power">Power (0 – 7)</label>
+            <input type="number" id="input-power" min="0" max="7" step="0.001" placeholder="e.g. 2.5">
+          </div>
+          <div class="score-input-group">
+            <label for="input-achievement">Achievement (0 – 7)</label>
+            <input type="number" id="input-achievement" min="0" max="7" step="0.001" placeholder="e.g. 5.8">
+          </div>
+          <div class="score-input-group">
+            <label for="input-hedonism">Hedonism (0 – 7)</label>
+            <input type="number" id="input-hedonism" min="0" max="7" step="0.001" placeholder="e.g. 5.667">
+          </div>
+          <div class="score-input-group">
+            <label for="input-stimulation">Stimulation (0 – 7)</label>
+            <input type="number" id="input-stimulation" min="0" max="7" step="0.001" placeholder="e.g. 6.667">
+          </div>
+          <div class="score-input-group">
+            <label for="input-selfDirection">Self-Direction (0 – 7)</label>
+            <input type="number" id="input-selfDirection" min="0" max="7" step="0.001" placeholder="e.g. 7">
+          </div>
+          <div class="score-input-group">
+            <label for="input-universalism">Universalism (0 – 7)</label>
+            <input type="number" id="input-universalism" min="0" max="7" step="0.001" placeholder="e.g. 5.333">
+          </div>
+          <div class="score-input-group">
+            <label for="input-benevolence">Benevolence (0 – 7)</label>
+            <input type="number" id="input-benevolence" min="0" max="7" step="0.001" placeholder="e.g. 4.556">
+          </div>
+          <div class="score-input-group">
+            <label for="input-tradition">Tradition (0 – 7)</label>
+            <input type="number" id="input-tradition" min="0" max="7" step="0.001" placeholder="e.g. 2.8">
+          </div>
+          <div class="score-input-group">
+            <label for="input-conformity">Conformity (0 – 7)</label>
+            <input type="number" id="input-conformity" min="0" max="7" step="0.001" placeholder="e.g. 2">
+          </div>
+          <div class="score-input-group">
+            <label for="input-security">Security (0 – 7)</label>
+            <input type="number" id="input-security" min="0" max="7" step="0.001" placeholder="e.g. 2.714">
+          </div>
+        </div>
+        <div class="score-entry-actions">
+          <button type="submit" class="btn btn-primary">Add to Chart</button>
+          <button type="button" class="btn btn-secondary" id="clear-results-btn">Clear Yours</button>
+          <button type="button" class="btn btn-secondary" id="change-colour-btn" hidden>Change colour</button>
+        </div>
+      </form>
+      <p class="score-entry-hint">Your scores appear as <strong>Your Result</strong> (orange-red, leftmost). <strong>My Result</strong> (deep red) stays on the chart as the default comparison.</p>
+    </section>
+
+    <div class="score-summary">
+      <div class="score-card score-card-my">
+        <div class="label">My Result</div>
+        <div class="score-grid" id="score-my-grid"></div>
+        <div class="range">Default comparison on the chart</div>
+      </div>
+      <div class="score-card" id="visitor-score-card">
+        <div class="label">Your Result</div>
+        <div class="score-grid" id="score-visitor-grid"></div>
+        <div class="range">From your YourMorals.org scores</div>
+      </div>
+    </div>
+
+    <section class="chart-section">
+      <h2>Compare your score against others&rsquo; scores</h2>
+      <p class="subtitle"><strong>My Result</strong> (deep red) is shown by default across all ten Schwartz dimensions. Add <strong>Your Result</strong> (orange-red, leftmost) to compare your own scores alongside demographic averages.</p>
+      <div class="chart-wrap chart-wrap-wide">
+        <canvas id="results-chart"></canvas>
+      </div>
+      <p class="chart-source-note">Demographic bars sourced from <a href="https://www.yourmorals.org/" target="_blank" rel="noopener">YourMorals.org</a>. Placeholder data pending capture.</p>
+    </section>
+
+    <section class="compare-section">
+      <h2>Filter by demographics</h2>
+      <p class="compare-intro">
+        Select up to three groups — one per category — to highlight on the chart, similar to the filters on
+        YourMorals.org&rsquo;s results page.
+      </p>
+
+      <div class="demographic-groups" id="demographic-groups"></div>
+
+      <div class="demographic-actions">
+        <div class="mass-presets">
+          <button type="button" class="btn btn-secondary mass-preset-btn" data-preset="low-selfDirection">Lowest self-direction</button>
+          <button type="button" class="btn btn-secondary mass-preset-btn" data-preset="high-selfDirection">Highest self-direction</button>
+          <button type="button" class="btn btn-secondary mass-preset-btn" data-preset="low-universalism">Lowest universalism</button>
+          <button type="button" class="btn btn-secondary mass-preset-btn" data-preset="high-universalism">Highest universalism</button>
+          <button type="button" class="btn btn-secondary" id="reset-chart-btn">Default</button>
+        </div>
+        <button type="button" class="btn btn-secondary" id="clear-demographics-btn">Clear demographics</button>
+      </div>
+
+      <p class="selection-hint">
+        Demographic averages from YourMorals.org API. For live comparisons, use the official
+        results page at <a href="https://www.yourmorals.org/" target="_blank" rel="noopener">yourmorals.org</a>.
+      </p>
+
+      <div class="filtered-result" id="filtered-result"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>Not affiliated with YourMorals.org. Scores must come from the official survey.</p>
+    </div>
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="results.js"></script>
+</body>
+</html>
