@@ -12,6 +12,10 @@ let visitorHue = Math.floor(Math.random() * 360);
 
 const DIMENSION_KEYS = DIMENSIONS.map((d) => d.key);
 
+function hasScores(obj) {
+  return DIMENSION_KEYS.some((k) => Number(obj[k]) > 0);
+}
+
 function extractScores(obj) {
   const scores = {};
   DIMENSION_KEYS.forEach((k) => { scores[k] = obj[k]; });
@@ -193,12 +197,16 @@ function labelForComboKey(key) {
 }
 
 function getAllScoredGroups() {
-  const groups = DEMOGRAPHICS.map((d) => ({
-    label: d.label,
-    ...extractScores(d),
-  }));
+  const groups = DEMOGRAPHICS
+    .filter((d) => hasScores(d))
+    .map((d) => ({
+      label: d.label,
+      id: d.id,
+      ...extractScores(d),
+    }));
 
   Object.entries(DEMOGRAPHIC_COMBOS).forEach(([key, scores]) => {
+    if (!hasScores(scores)) return;
     groups.push({
       label: labelForComboKey(key),
       ...extractScores(scores),
@@ -214,7 +222,12 @@ function applyMassPreset(preset) {
 
   const ascending = match[1] === 'low';
   const field = match[2];
-  const sorted = [...getAllScoredGroups()].sort((a, b) => (
+  const scored = getAllScoredGroups();
+  if (scored.length === 0) {
+    updateFilteredMessage('No demographic scores in data.js yet — run python3 scripts/build_data.py');
+    return;
+  }
+  const sorted = [...scored].sort((a, b) => (
     ascending ? a[field] - b[field] : b[field] - a[field]
   ));
 
@@ -263,11 +276,12 @@ function getVisibleDemographics() {
   const selectionBars = [];
 
   DEMOGRAPHICS.filter((d) => selectedDemographics.has(d.id)).forEach((d) => {
+    if (!hasScores(d)) return;
     selectionBars.push({ label: d.label, id: d.id, ...extractScores(d) });
   });
 
   [...selectedCombos]
-    .filter((key) => DEMOGRAPHIC_COMBOS[key])
+    .filter((key) => DEMOGRAPHIC_COMBOS[key] && hasScores(DEMOGRAPHIC_COMBOS[key]))
     .forEach((key) => {
       const combo = DEMOGRAPHIC_COMBOS[key];
       selectionBars.push({
@@ -284,7 +298,11 @@ function getVisibleDemographics() {
     return personal;
   }
 
-  return [...personal, ...DEMOGRAPHICS.map((d) => ({ label: d.label, id: d.id, ...extractScores(d) }))];
+  const demographicBars = DEMOGRAPHICS
+    .filter((d) => hasScores(d))
+    .map((d) => ({ label: d.label, id: d.id, ...extractScores(d) }));
+
+  return [...personal, ...demographicBars];
 }
 
 function resetToDefaultChart() {
@@ -330,8 +348,9 @@ function renderChart(forceRebuild = false) {
   const canvas = document.getElementById('results-chart');
   const groups = getVisibleDemographics();
   const data = buildChartData(groups);
+  const datasetCount = data.datasets.length;
 
-  if (chart && forceRebuild) {
+  if (chart && (forceRebuild || chart.data.datasets.length !== datasetCount)) {
     chart.destroy();
     chart = null;
   }
@@ -339,7 +358,7 @@ function renderChart(forceRebuild = false) {
   if (chart) {
     chart.data.labels = data.labels;
     chart.data.datasets = data.datasets;
-    chart.update('none');
+    chart.update();
     return;
   }
 
@@ -384,6 +403,7 @@ function renderChart(forceRebuild = false) {
           },
         },
         x: {
+          stacked: false,
           grid: { display: false },
           ticks: {
             font: { family: "'Source Sans 3', sans-serif", size: 11 },
@@ -428,7 +448,8 @@ function updateScoreDisplay() {
 }
 
 function getComboStatus(key) {
-  if (DEMOGRAPHIC_COMBOS[key]) return 'captured';
+  const scores = DEMOGRAPHIC_COMBOS[key];
+  if (scores && hasScores(scores)) return 'captured';
   if (DEMOGRAPHIC_NO_DATA.has(key)) return 'no_data';
   if (DEMOGRAPHIC_NOT_ENOUGH.has(key)) return 'not_enough';
   return 'missing';
@@ -595,6 +616,11 @@ function renderCategorySection(container, { key, title }) {
         if (selectedDemographics.size >= 3) {
           e.target.checked = false;
           updateFilteredMessage('You can select up to three groups — one per category.');
+          return;
+        }
+        if (!hasScores(d)) {
+          e.target.checked = false;
+          updateFilteredMessage(`${d.label} has no score data yet — run scripts/build_data.py to populate data.js.`);
           return;
         }
         selectedDemographics.add(d.id);
