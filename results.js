@@ -332,7 +332,7 @@ function clearDemographics() {
 function buildChartData(groups) {
   const colored = assignBarColors(groups);
   return {
-    labels: DIMENSIONS.map((d) => d.short),
+    labels: DIMENSIONS.map((d) => d.label),
     datasets: colored.map((g) => ({
       label: g.label,
       data: DIMENSION_KEYS.map((k) => g[k]),
@@ -406,7 +406,10 @@ function renderChart(forceRebuild = false) {
           stacked: false,
           grid: { display: false },
           ticks: {
-            font: { family: "'Source Sans 3', sans-serif", size: 11 },
+            font: { family: "'Source Sans 3', sans-serif", size: 10 },
+            maxRotation: 45,
+            minRotation: 35,
+            autoSkip: false,
           },
         },
       },
