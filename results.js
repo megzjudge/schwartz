@@ -298,8 +298,10 @@ function getVisibleDemographics() {
     return personal;
   }
 
+  const DEFAULT_VIEW_IDS = ['male', 'female', 'liberal', 'conservative', 'moderate'];
+
   const demographicBars = DEMOGRAPHICS
-    .filter((d) => hasScores(d))
+    .filter((d) => DEFAULT_VIEW_IDS.includes(d.id) && hasScores(d))
     .map((d) => ({ label: d.label, id: d.id, ...extractScores(d) }));
 
   return [...personal, ...demographicBars];
