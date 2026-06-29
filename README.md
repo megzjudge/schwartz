@@ -38,4 +38,4 @@ Two-filter combos are captured from YourMorals `average1` API responses. Groups 
 
 ## License
 
-Personal project, not affiliated with YourMorals.org. Demographic averages sourced from YourMorals.org and their contributors, whom retain copyright. Personal results shown on this site are my own and may not be reproduced.
+Personal project, not affiliated with YourMorals.org. Demographic averages sourced from YourMorals.org and their contributors, who hold copyright over the data. Personal results shown on this site are my own and may not be reproduced.
