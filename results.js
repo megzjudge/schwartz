@@ -66,45 +66,46 @@ function colorDistance(hex1, hex2) {
   return Math.sqrt(dh * dh + ds * ds + dl * dl);
 }
 
-function isDistinctEnough(candidate, usedColors, minDistance = 0.85) {
-  return [...usedColors].every((used) => colorDistance(candidate, used) >= minDistance);
-}
+// Greedy farthest-point colour generation. Each call samples a fresh batch of
+// random hue/sat/light candidates and keeps whichever maximizes the minimum
+// distance to colours already chosen. This guarantees colours stay visually
+// separated (no two demographics landing on near-identical colours) while
+// still being genuinely random from page load to page load, since every
+// candidate is freshly randomized rather than walked from a fixed sequence.
+function generateDistinctColors(count, avoidColors = [], samplesPerPick = 60) {
+  const chosen = [...avoidColors];
+  const result = [];
+  const satOptions = [82, 70, 60];
+  const lightOptions = [42, 50, 58, 66];
 
-function generateDiverseColorPool(size) {
-  const satLevels = [78, 62, 72, 55, 68, 58];
-  const lightLevels = [42, 62, 48, 68, 38, 55, 72, 45];
-  const colors = [];
+  for (let n = 0; n < count; n++) {
+    let best = null;
+    let bestScore = -Infinity;
 
-  for (let i = 0; i < size; i++) {
-    const hue = (i * 360) / size;
-    const sat = satLevels[i % satLevels.length];
-    const light = lightLevels[Math.floor(i / 3) % lightLevels.length];
-    colors.push(hslToHex(hue, sat, light));
-  }
+    for (let i = 0; i < samplesPerPick; i++) {
+      const hue = Math.random() * 360;
+      const sat = satOptions[Math.floor(Math.random() * satOptions.length)];
+      const light = lightOptions[Math.floor(Math.random() * lightOptions.length)];
+      const candidate = hslToHex(hue, sat, light);
 
-  return colors;
-}
+      let minDist = chosen.length === 0 ? Infinity : 0;
+      for (const c of chosen) {
+        const d = colorDistance(candidate, c);
+        if (d < minDist || chosen.length === 0) minDist = d;
+      }
+      if (chosen.length === 0) minDist = Infinity;
 
-const COLOR_POOL = generateDiverseColorPool(160);
-
-function pickDistinctColor(usedColors) {
-  for (const color of COLOR_POOL) {
-    if (color === MY_RESULT.color) continue;
-    if (isDistinctEnough(color, usedColors)) return color;
-  }
-
-  for (let hue = 0; hue < 360; hue += 13) {
-    for (const sat of [75, 60]) {
-      for (const light of [42, 58, 68]) {
-        const color = hslToHex(hue, sat, light);
-        if (color !== MY_RESULT.color && isDistinctEnough(color, usedColors, 0.75)) {
-          return color;
-        }
+      if (minDist > bestScore) {
+        bestScore = minDist;
+        best = candidate;
       }
     }
+
+    chosen.push(best);
+    result.push(best);
   }
 
-  return hslToHex((usedColors.size * 47) % 360, 70, 50);
+  return result;
 }
 
 function initBarColors() {
@@ -112,42 +113,29 @@ function initBarColors() {
   demographicColorById.clear();
   barColorMap.set(MY_RESULT.label, MY_RESULT.color);
 
-  const used = new Set([MY_RESULT.color]);
-  const hueOffset = Math.random() * 360;
-  const categoryOrder = ['gender', 'age', 'religiosity', 'political', 'education', 'race'];
+  const used = [MY_RESULT.color];
 
-  categoryOrder.forEach((category, catIdx) => {
-    const items = DEMOGRAPHICS.filter((d) => d.category === category);
-    const hueStep = 360 / Math.max(items.length, 1);
+  // "Your Result" plus every demographic get the strongest separation pass,
+  // since these are the colours most likely to be compared side by side.
+  const primaryColors = generateDistinctColors(DEMOGRAPHICS.length + 1, used, 60);
+  const yourColor = primaryColors[0];
+  barColorMap.set('Your Result', yourColor);
+  used.push(yourColor);
 
-    items.forEach((item, i) => {
-      let hue = (hueOffset + catIdx * 57 + i * hueStep) % 360;
-      const sat = 68 + (i % 2) * 12;
-      const light = 44 + (i % 3) * 11;
-      let color = hslToHex(hue, sat, light);
-      let n = 0;
-
-      while (!isDistinctEnough(color, used, 0.7) && n < 24) {
-        hue = (hue + 23) % 360;
-        color = hslToHex(hue, sat, light);
-        n++;
-      }
-
-      demographicColorById.set(item.id, color);
-      barColorMap.set(item.label, color);
-      used.add(color);
-    });
+  DEMOGRAPHICS.forEach((item, i) => {
+    const color = primaryColors[i + 1];
+    demographicColorById.set(item.id, color);
+    barColorMap.set(item.label, color);
+    used.push(color);
   });
 
-  const yourColor = pickDistinctColor(used);
-  barColorMap.set('Your Result', yourColor);
-  used.add(yourColor);
-
-  Object.keys(DEMOGRAPHIC_COMBOS).forEach((key) => {
+  // Combos are numerous and rarely all shown at once, so a lighter sampling
+  // pass keeps page load fast while still avoiding obvious collisions.
+  const comboKeys = Object.keys(DEMOGRAPHIC_COMBOS);
+  const comboColors = generateDistinctColors(comboKeys.length, used, 25);
+  comboKeys.forEach((key, i) => {
     const label = labelForComboKey(key);
-    const color = pickDistinctColor(used);
-    barColorMap.set(label, color);
-    used.add(color);
+    barColorMap.set(label, comboColors[i]);
   });
 }
 
@@ -611,18 +599,6 @@ function renderCategorySection(container, { key, title }) {
       if (e.target.checked) {
         showPersonalOnly = false;
         clearMassPreset();
-
-        DEMOGRAPHICS.filter((item) => item.category === d.category && item.id !== d.id).forEach((item) => {
-          selectedDemographics.delete(item.id);
-          const otherInput = document.getElementById(`demo-${item.id}`);
-          if (otherInput) otherInput.checked = false;
-        });
-
-        if (selectedDemographics.size >= 3) {
-          e.target.checked = false;
-          updateFilteredMessage('You can select up to three groups — one per category.');
-          return;
-        }
         selectedDemographics.add(d.id);
       } else {
         selectedDemographics.delete(d.id);
