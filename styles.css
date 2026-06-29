@@ -857,6 +857,43 @@ a:hover { color: var(--accent-hover); }
 
 .value-tensions strong { color: var(--muted); }
 
+.ref-link {
+  font-size: 0.72em;
+  vertical-align: super;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 700;
+  padding: 0 1px;
+}
+.ref-link:hover { text-decoration: underline; }
+
+.references-section {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 2px solid var(--border);
+}
+.references-section h2 {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-size: 1.1rem;
+  margin-bottom: 14px;
+}
+.references-list {
+  margin: 0 0 0 20px;
+  padding: 0;
+  font-size: 0.84rem;
+  color: var(--text);
+  line-height: 1.75;
+}
+.references-list li { margin-bottom: 8px; }
+.references-list a { color: var(--accent); }
+.back-ref {
+  font-size: 0.85em;
+  color: var(--muted);
+  text-decoration: none;
+  margin-left: 5px;
+}
+.back-ref:hover { color: var(--accent); }
+
 /* ---- end Values page ---- */
 
 @media (max-width: 900px) {
