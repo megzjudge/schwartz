@@ -985,4 +985,10 @@ a:hover { color: var(--accent-hover); }
   .dimensions-grid { grid-template-columns: 1fr; }
   .value-meta { grid-template-columns: 1fr; gap: 14px; }
   .value-card { padding: 20px 16px; }
+
+  .schwartz-diagram-wrap {
+    margin-left: -16px;
+    margin-right: -16px;
+    max-width: none;
+  }
 }
