@@ -21,6 +21,7 @@ Demographic structure is bundled in `data.js` with placeholder zeros pending API
 |------|---------|
 | `index.html` | About the Schwartz value framework and links to the survey |
 | `results.html` | Score entry, chart, demographic filters, and combo explorer |
+| `values.html` | In-depth breakdown of all ten value facets — motivational goals, empirical correlates, tensions, and a clickable inline SVG recreation of Schwartz's circular model (Figure 1) |
 
 ## Data
 
