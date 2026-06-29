@@ -450,9 +450,8 @@ function updateScoreDisplay() {
 function getComboStatus(key) {
   const scores = DEMOGRAPHIC_COMBOS[key];
   if (scores && hasScores(scores)) return 'captured';
-  if (DEMOGRAPHIC_NO_DATA.has(key)) return 'no_data';
   if (DEMOGRAPHIC_NOT_ENOUGH.has(key)) return 'not_enough';
-  return 'missing';
+  return 'no_data';
 }
 
 function getCombosGroupedByCategory(categoryKey) {
@@ -523,7 +522,7 @@ function renderComboPanel(section, categoryKey) {
   const statusLabels = {
     no_data: 'no data',
     not_enough: 'not enough data',
-    missing: 'not captured',
+    missing: 'no data',
   };
 
   grouped.forEach(({ anchor, combos }) => {
@@ -594,13 +593,14 @@ function renderCategorySection(container, { key, title }) {
   DEMOGRAPHICS.filter((d) => d.category === key).forEach((d) => {
     const li = document.createElement('li');
     const id = `demo-${d.id}`;
-    li.innerHTML = `
-      <label for="${id}">
-        <input type="checkbox" id="${id}" value="${d.id}">
-        ${d.label}
-      </label>
-    `;
+    const available = hasScores(d);
+    li.className = available ? 'demo-item' : 'demo-item demo-item-unavailable';
+    li.innerHTML = available
+      ? `<label for="${id}"><input type="checkbox" id="${id}" value="${d.id}">${d.label}</label>`
+      : `<span class="demo-item-label">${d.label}</span><span class="demo-item-status">no data</span>`;
     list.appendChild(li);
+
+    if (!available) return;
 
     li.querySelector('input').addEventListener('change', (e) => {
       if (e.target.checked) {
@@ -616,11 +616,6 @@ function renderCategorySection(container, { key, title }) {
         if (selectedDemographics.size >= 3) {
           e.target.checked = false;
           updateFilteredMessage('You can select up to three groups — one per category.');
-          return;
-        }
-        if (!hasScores(d)) {
-          e.target.checked = false;
-          updateFilteredMessage(`${d.label} has no score data yet — run scripts/build_data.py to populate data.js.`);
           return;
         }
         selectedDemographics.add(d.id);

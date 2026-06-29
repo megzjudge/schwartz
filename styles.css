@@ -513,6 +513,34 @@ a:hover { color: var(--accent-hover); }
   flex-shrink: 0;
 }
 
+.demo-item {
+  display: flex;
+  align-items: center;
+}
+
+.demo-item-unavailable {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.88rem;
+  color: var(--muted);
+  padding: 5px 0;
+  line-height: 1.35;
+}
+
+.demo-item-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.demo-item-status {
+  font-style: italic;
+  font-size: 0.68rem;
+  white-space: nowrap;
+  color: #b87850;
+}
+
 .combo-toggle {
   margin-top: 8px;
   padding: 0;
@@ -607,7 +635,6 @@ a:hover { color: var(--accent-hover); }
   min-width: 0;
 }
 
-.combo-item.missing,
 .combo-item.no_data,
 .combo-item.not_enough {
   color: var(--muted);
